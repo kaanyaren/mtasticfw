@@ -249,20 +249,52 @@ const char *getDeviceName()
 
 static int32_t ledBlinker()
 {
+    static float brightness = 0;
+    static bool increasing = true;
+    static const float FADE_STEP = 54.0f;  // Brightness change per update (27x faster)
+    static uint32_t lastStateChange = 0;
+    
     // Still set up the blinking (heartbeat) interval but skip code path below, so LED will blink if
     // config.device.led_heartbeat_disabled is changed
     if (config.device.led_heartbeat_disabled)
         return 1000;
+    
+    uint32_t now = millis();
 
-    static bool ledOn;
-    ledOn ^= 1;
+    // Only pause when LED is completely off
+    if (brightness <= 0 && (now - lastStateChange < 1800)) {
+        return 10; // Short delay while pausing
+    }
 
-    ledBlink.set(ledOn);
+    // Update brightness
+    if (increasing) {
+        brightness += FADE_STEP;
+        if (brightness >= 255) {
+            brightness = 255;
+            increasing = false;
+            lastStateChange = now;
+        }
+    } else {
+        brightness -= FADE_STEP;
+        if (brightness <= 0) {
+            brightness = 0;
+            increasing = true;
+            lastStateChange = now;
+        }
+    }
 
-    // have a very sparse duty cycle of LED being on, unless charging, then blink 0.5Hz square wave rate to indicate that
-    return powerStatus->getIsCharging() ? 1000 : (ledOn ? 1 : 1000);
+    // Update LED
+#ifdef LED_PIN
+    #ifdef LED_STATE_ON
+        analogWrite(LED_PIN, LED_STATE_ON ? brightness : (255 - brightness));
+    #else
+        analogWrite(LED_PIN, brightness);
+    #endif
+#endif
+
+    // Small delay to control fade speed
+    return 10;
 }
-
 uint32_t timeLastPowered = 0;
 
 static Periodic *ledPeriodic;

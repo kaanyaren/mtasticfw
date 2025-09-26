@@ -83,7 +83,31 @@ void playGPSDisableBeep()
 
 void playStartMelody()
 {
-    ToneDuration melody[] = {{NOTE_FS3, DURATION_1_8}, {NOTE_AS3, DURATION_1_8}, {NOTE_CS4, DURATION_1_4}};
+    // Beethoven's 9th Symphony "Ode to Joy" theme (more complete)
+    ToneDuration melody[] = {
+        // First phrase
+        {NOTE_E3, DURATION_1_4},     // Freu-
+        {NOTE_E3, DURATION_1_4},     // de
+        {NOTE_F3, DURATION_1_4},     // schö-
+        {NOTE_G3, DURATION_1_4},     // ner
+        
+        // Second phrase
+        {NOTE_G3, DURATION_1_4},     // Göt-
+        {NOTE_F3, DURATION_1_4},     // ter-
+        {NOTE_E3, DURATION_1_4},     // fun-
+        {NOTE_D3, DURATION_1_4},     // ken,
+        
+        // Third phrase
+        {NOTE_C3, DURATION_1_4},     // Toch-
+        {NOTE_C3, DURATION_1_4},     // ter
+        {NOTE_D3, DURATION_1_4},     // aus
+        {NOTE_E3, DURATION_1_4},     // E-
+        
+        // Fourth phrase (climax)
+        {NOTE_E3, DURATION_1_4},     // ly-
+        {NOTE_D3, DURATION_1_8},     // si-
+        {NOTE_D3, DURATION_1_2}      // um!
+    };
     playTones(melody, sizeof(melody) / sizeof(ToneDuration));
 }
 
@@ -140,10 +164,6 @@ bool playNextLeadUpNote()
     playTones(&note, 1); // Play single note using existing playTones function
 
     leadUpNoteIndex++;
-
-    if (leadUpNoteIndex >= leadUpNotesCount) {
-        return false; // this was the final note
-    }
     return true; // Note was played (playTones handles buzzer availability internally)
 }
 

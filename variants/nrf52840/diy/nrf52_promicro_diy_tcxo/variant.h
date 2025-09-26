@@ -80,7 +80,7 @@ NRF52 PRO MICRO PIN ASSIGNMENT
 #define PIN_WIRE_SCL (0 + 11) // P0.11
 
 // LED
-#define PIN_LED1 (0 + 15) // P0.15
+#define PIN_LED1 (0 + 15) // P0.15 for standard, P0.22 for diy.
 #define LED_BUILTIN PIN_LED1
 // Actually red
 #define LED_BLUE PIN_LED1
