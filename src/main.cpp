@@ -251,7 +251,7 @@ static int32_t ledBlinker()
 {
     static float brightness = 0;
     static bool increasing = true;
-    static const float FADE_STEP = 54.0f;  // Brightness change per update (27x faster)
+    static const float FADE_STEP = 27.0f;  // Brightness change per update
     static uint32_t lastStateChange = 0;
     
     // Still set up the blinking (heartbeat) interval but skip code path below, so LED will blink if

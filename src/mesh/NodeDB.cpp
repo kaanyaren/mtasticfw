@@ -10,6 +10,7 @@
 #include "MeshRadio.h"
 #include "MeshService.h"
 #include "NodeDB.h"
+#include "buzz/buzz.h"
 #include "PacketHistory.h"
 #include "PowerFSM.h"
 #include "RTC.h"
@@ -1723,6 +1724,8 @@ void NodeDB::updateFrom(const meshtastic_MeshPacket &mp)
             return;
         }
 
+        // Save previous last_heard so we can enforce a cooldown for notification sounds
+        uint32_t previous_last_heard = info->last_heard;
         if (mp.rx_time) // if the packet has a valid timestamp use it to update our last_heard
             info->last_heard = mp.rx_time;
 
@@ -1733,8 +1736,25 @@ void NodeDB::updateFrom(const meshtastic_MeshPacket &mp)
 
         // If hopStart was set and there wasn't someone messing with the limit in the middle, add hopsAway
         if (mp.hop_start != 0 && mp.hop_limit <= mp.hop_start) {
+            int previous_hops = info->has_hops_away ? info->hops_away : -1;
             info->has_hops_away = true;
             info->hops_away = mp.hop_start - mp.hop_limit;
+            // If this node became a direct neighbor (0 hops away) and previously was not direct,
+            // trigger a short double beep to notify the user — unless we saw this node within the
+            // last hour (cooldown).
+            if (info->hops_away == 0 && previous_hops != 0) {
+                bool shouldBeep = true;
+                const uint32_t COOLDOWN_SECS = 60 * 60; // 1 hour
+                if (previous_last_heard != 0 && mp.rx_time != 0) {
+                    // If we have timestamps, suppress beep when last seen was within cooldown
+                    if (mp.rx_time > previous_last_heard && (mp.rx_time - previous_last_heard) < COOLDOWN_SECS)
+                        shouldBeep = false;
+                }
+                if (shouldBeep) {
+                    // Ensure buzzer functions are available
+                    playDoubleBeep();
+                }
+            }
         }
         sortMeshDB();
     }

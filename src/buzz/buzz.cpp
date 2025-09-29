@@ -30,6 +30,24 @@ struct ToneDuration {
 #define NOTE_B3 247
 #define NOTE_CS4 277
 
+// Some additional notes sometimes referenced
+#ifndef NOTE_C4
+#define NOTE_C4 261
+#endif
+#ifndef NOTE_C5
+#define NOTE_C5 523
+#endif
+#ifndef NOTE_B4
+#define NOTE_B4 494
+#endif
+// More notes
+#ifndef NOTE_A4
+#define NOTE_A4 440
+#endif
+#ifndef NOTE_AS4
+#define NOTE_AS4 466
+#endif
+
 const int DURATION_1_8 = 125;  // 1/8 note
 const int DURATION_1_4 = 250;  // 1/4 note
 const int DURATION_1_2 = 500;  // 1/2 note
@@ -83,30 +101,32 @@ void playGPSDisableBeep()
 
 void playStartMelody()
 {
-    // Beethoven's 9th Symphony "Ode to Joy" theme (more complete)
+    // Modern tech startup melody
+    const int DURATION_QUICK = 80;    // Very short notes for sparkle
+    const int DURATION_SHORT = 120;   // Standard notes
+    const int DURATION_LONG = 300;    // Longer held notes
+    
     ToneDuration melody[] = {
-        // First phrase
-        {NOTE_E3, DURATION_1_4},     // Freu-
-        {NOTE_E3, DURATION_1_4},     // de
-        {NOTE_F3, DURATION_1_4},     // schö-
-        {NOTE_G3, DURATION_1_4},     // ner
-        
-        // Second phrase
-        {NOTE_G3, DURATION_1_4},     // Göt-
-        {NOTE_F3, DURATION_1_4},     // ter-
-        {NOTE_E3, DURATION_1_4},     // fun-
-        {NOTE_D3, DURATION_1_4},     // ken,
-        
-        // Third phrase
-        {NOTE_C3, DURATION_1_4},     // Toch-
-        {NOTE_C3, DURATION_1_4},     // ter
-        {NOTE_D3, DURATION_1_4},     // aus
-        {NOTE_E3, DURATION_1_4},     // E-
-        
-        // Fourth phrase (climax)
-        {NOTE_E3, DURATION_1_4},     // ly-
-        {NOTE_D3, DURATION_1_8},     // si-
-        {NOTE_D3, DURATION_1_2}      // um!
+       {NOTE_C4, DURATION_1_4},
+        {NOTE_C5, DURATION_1_4},
+        {NOTE_B3, DURATION_1_4},
+        {NOTE_C3, DURATION_1_4},
+        {164, DURATION_1_4},
+        {195, DURATION_1_4},
+        {NOTE_B4, DURATION_1_4},
+        {65, DURATION_1_2},
+        {130, DURATION_1_2},
+        {NOTE_AS3, DURATION_1_8},
+        {NOTE_AS4, DURATION_1_8},
+        {NOTE_B3, DURATION_1_8},
+        {NOTE_B4, DURATION_1_8},
+        {NOTE_AS3, DURATION_1_8},
+        {NOTE_AS4, DURATION_1_8},
+        {NOTE_A3, DURATION_1_8},
+        {NOTE_A4, DURATION_1_8},
+        {NOTE_C3, DURATION_1_4},
+        {164, DURATION_1_4},
+        {195, DURATION_1_4}    // resolving note
     };
     playTones(melody, sizeof(melody) / sizeof(ToneDuration));
 }
@@ -184,4 +204,18 @@ void playComboTune()
         {NOTE_B3, 120}  // Ending chirp
     };
     playTones(melody, sizeof(melody) / sizeof(ToneDuration));
+}
+
+void playDoubleBeep()
+{
+    // Two short beeps separated by a short pause
+    // playTones expects valid frequency; handle silence by splitting into two calls
+    if (config.device.buzzer_gpio) {
+        ToneDuration first[] = {{NOTE_B3, 80}};
+        ToneDuration second[] = {{NOTE_B3, 80}};
+        playTones(first, 1);
+        // short pause
+        delay(60);
+        playTones(second, 1);
+    }
 }
