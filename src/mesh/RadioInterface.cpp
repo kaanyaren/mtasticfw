@@ -37,7 +37,7 @@ const RegionInfo regions[] = {
         https://www.etsi.org/deliver/etsi_en/300200_300299/30022002/03.02.01_60/en_30022002v030201p.pdf
         FIXME: https://github.com/meshtastic/firmware/issues/3371
      */
-    RDEF(EU_433, 433.0f, 434.0f, 10, 0, 10, true, false, false),
+    RDEF(EU_433, 433.0f, 434.0f, 50, 0, 22, true, false, false),
 
     /*
        https://www.thethingsnetwork.org/docs/lorawan/duty-cycle/
@@ -668,6 +668,16 @@ void RadioInterface::limitPower(int8_t loraMaxPower)
 
     if (myRegion->powerLimit)
         maxPower = myRegion->powerLimit;
+
+    // Enforce an additional cap for non-licensed (non-HAM) users.
+    // Some regions allow higher output for licensed amateur operation; however
+    // for unlicensed users we want to be conservative and cap at 22 dBm.
+    if (!devicestate.owner.is_licensed) {
+        const uint8_t NON_LICENSED_MAX_DBM = 22;
+        if (maxPower > NON_LICENSED_MAX_DBM) {
+            maxPower = NON_LICENSED_MAX_DBM;
+        }
+    }
 
     if ((power > maxPower) && !devicestate.owner.is_licensed) {
         LOG_INFO("Lower transmit power because of regulatory limits");

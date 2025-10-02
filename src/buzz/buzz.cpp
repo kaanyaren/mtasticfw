@@ -48,6 +48,17 @@ struct ToneDuration {
 #define NOTE_AS4 466
 #endif
 
+// Define a few common notes used by the startup melody if not already present
+#ifndef NOTE_D4
+#define NOTE_D4 294
+#endif
+#ifndef NOTE_E4
+#define NOTE_E4 329
+#endif
+#ifndef NOTE_G4
+#define NOTE_G4 392
+#endif
+
 const int DURATION_1_8 = 125;  // 1/8 note
 const int DURATION_1_4 = 250;  // 1/4 note
 const int DURATION_1_2 = 500;  // 1/2 note
@@ -101,33 +112,18 @@ void playGPSDisableBeep()
 
 void playStartMelody()
 {
-    // Modern tech startup melody
-    const int DURATION_QUICK = 80;    // Very short notes for sparkle
-    const int DURATION_SHORT = 120;   // Standard notes
-    const int DURATION_LONG = 300;    // Longer held notes
-    
+    // Short bright 5-note startup melody (~0.5s total on typical hardware)
+    // Use short durations so the whole tune stays under ~1 second including inter-note gaps.
+    const int NOTE_DUR_MS = 80; // each note ~80ms; playTones delays ~1.3x duration between notes
+
     ToneDuration melody[] = {
-       {NOTE_C4, DURATION_1_4},
-        {NOTE_C5, DURATION_1_4},
-        {NOTE_B3, DURATION_1_4},
-        {NOTE_C3, DURATION_1_4},
-        {164, DURATION_1_4},
-        {195, DURATION_1_4},
-        {NOTE_B4, DURATION_1_4},
-        {65, DURATION_1_2},
-        {130, DURATION_1_2},
-        {NOTE_AS3, DURATION_1_8},
-        {NOTE_AS4, DURATION_1_8},
-        {NOTE_B3, DURATION_1_8},
-        {NOTE_B4, DURATION_1_8},
-        {NOTE_AS3, DURATION_1_8},
-        {NOTE_AS4, DURATION_1_8},
-        {NOTE_A3, DURATION_1_8},
-        {NOTE_A4, DURATION_1_8},
-        {NOTE_C3, DURATION_1_4},
-        {164, DURATION_1_4},
-        {195, DURATION_1_4}    // resolving note
+        {NOTE_C4, NOTE_DUR_MS},
+        {NOTE_D4, NOTE_DUR_MS},
+        {NOTE_E4, NOTE_DUR_MS},
+        {NOTE_G4, NOTE_DUR_MS},
+        {NOTE_C5, NOTE_DUR_MS}
     };
+
     playTones(melody, sizeof(melody) / sizeof(ToneDuration));
 }
 
