@@ -168,6 +168,10 @@ bool pmu_irq = false;
 
 Power *power;
 
+// Notification state for low-battery alerts so we don't spam the user repeatedly
+static bool battery_notified_10 = false;
+static bool battery_notified_5 = false;
+
 using namespace meshtastic;
 
 #ifndef AREF_VOLTAGE
@@ -831,6 +835,38 @@ void Power::readPowerStatus()
     LOG_DEBUG("Battery: usbPower=%d, isCharging=%d, batMv=%d, batPct=%d", powerStatus2.getHasUSB(), powerStatus2.getIsCharging(),
               powerStatus2.getBatteryVoltageMv(), powerStatus2.getBatteryChargePercent());
     newStatus.notifyObservers(&powerStatus2);
+#if HAS_SCREEN
+    // Battery threshold notifications: show banner + play sound once per threshold crossing
+    if (powerStatus2.getBatteryChargePercent() >= 0) {
+        int pct = powerStatus2.getBatteryChargePercent();
+
+        // Reset notifications when battery rises above 12% so they can be re-triggered if battery falls again
+        if (pct > 12) {
+            battery_notified_10 = false;
+            battery_notified_5 = false;
+        }
+
+        // 10% threshold
+        if (pct <= 10 && !battery_notified_10) {
+            battery_notified_10 = true;
+            if (screen) {
+                screen->showSimpleBanner("Battery low: 10%", 5000);
+            }
+            // Gentle alert tone
+            playBeep();
+        }
+
+        // 5% threshold
+        if (pct <= 5 && !battery_notified_5) {
+            battery_notified_5 = true;
+            if (screen) {
+                screen->showSimpleBanner("Battery critical: 5%", 0); // keep until acknowledged or power state changes
+            }
+            // Stronger alert tone
+            playLongBeep();
+        }
+    }
+#endif
 #ifdef DEBUG_HEAP
     if (lastheap != memGet.getFreeHeap()) {
         // Use stack-allocated buffer to avoid heap allocations in monitoring code
