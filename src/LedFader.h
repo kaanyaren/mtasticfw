@@ -1,5 +1,4 @@
 #pragma once
-#include <stdint.h>
 
 /**
  * A class to handle LED fading effects

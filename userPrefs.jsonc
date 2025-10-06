@@ -55,6 +55,6 @@
   // "USERPREFS_MQTT_TLS_ENABLED": "false",
   // "USERPREFS_MQTT_ROOT_TOPIC": "event/REPLACEME",
   // "USERPREFS_RINGTONE_NAG_SECS": "60",
-  "USERPREFS_RINGTONE_RTTTL": "Popeye:o=6,d=8,b=160,b=160:a5,c,c,c,4a#5,a5,4c,2p,c,d,a#5,d,4f,d,2c,p,c,d,a#5,d,f,e,d,c,d,c,a5,f5,a5,c,d,c,4a#5,g5,2f5",
+  "USERPREFS_RINGTONE_RTTTL": "24:d=32,o=5,b=565:f6,p,f6,4p,p,f6,p,f6,2p,p,b6,p,b6,p,b6,p,b6,p,b,p,b,p,b,p,b,p,b,p,b,p,b,p,b,1p.,2p.,p",
   "USERPREFS_TZ_STRING": "tzplaceholder                                         "
 }
